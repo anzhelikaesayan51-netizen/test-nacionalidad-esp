@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCSE · Test de práctica</title>
+<style>
+:root{--ink:#24332f;--muted:#66746e;--paper:#fbfaf6;--card:#fff;--line:#dce3dc;--green:#2e6653;--green-pale:#e8f3ed;--red:#a33e38;--red-pale:#fff0ee;--gold:#d7a84b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:#243f37;color:white;padding:30px 20px 26px}
+.wrap{max-width:900px;margin:auto}
+.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:.75rem;color:#e5c77d;font-weight:700}
+h1{font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.1;margin:.5rem 0}
+header p{max-width:680px;color:#e0e9e3;margin:.6rem 0 0}
+main{padding:24px 16px 60px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.pill{background:#f0eadb;border-radius:999px;padding:6px 12px;font-size:.85rem}
+.progress{height:8px;background:#e3e8e2;border-radius:10px;overflow:hidden;margin:12px 0 24px}
+.progress div{height:100%;width:0;background:var(--gold);transition:width .2s}
+.section-title{font-size:1.15rem;margin:28px 0 12px}
+.question{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:0 0 14px;box-shadow:0 2px 8px #20372c08}
+.qhead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.qnum{font-size:.8rem;color:var(--muted);font-weight:700}
+.tag{font-size:.75rem;color:var(--green);background:var(--green-pale);padding:3px 8px;border-radius:999px;white-space:nowrap}
+.question h3{font-size:1.02rem;font-weight:650;margin:10px 0 14px}
+.options{display:grid;gap:8px}
+.option{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:inherit;cursor:pointer;transition:.15s}
+.option:hover:not(:disabled){border-color:var(--green);background:#f8fbf8}
+.option .letter{font-weight:750;color:var(--green);min-width:20px}
+.option:disabled{cursor:default}
+.option.correct{border-color:#6caa88;background:var(--green-pale)}
+.option.incorrect{border-color:#d78b84;background:var(--red-pale)}
+.feedback{display:none;margin-top:12px;border-radius:10px;padding:12px 14px;font-size:.94rem}
+.feedback.show{display:block}
+.feedback.good{background:var(--green-pale);border-left:4px solid #4d946b}
+.feedback.bad{background:var(--red-pale);border-left:4px solid #bd5b53}
+.feedback strong{display:block;margin-bottom:3px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0}
+button.action{border:0;border-radius:10px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer}
+.primary{background:var(--green);color:white}.secondary{background:#e9eee9;color:var(--ink)}
+button.action:disabled{cursor:default} button.action:focus-visible,.option:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+#results{display:none;background:white;border:1px solid var(--line);border-radius:16px;padding:24px;margin-top:22px}
+#results.show{display:block}
+.score{font-size:2.4rem;font-weight:800;line-height:1.2}
+.small{font-size:.9rem;color:var(--muted)}
+.block-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin:18px 0}
+.block-results div{background:#f5f6f1;border-radius:10px;padding:12px}
+.block-results strong{display:block;font-size:1.2rem}
+footer{color:var(--muted);font-size:.85rem;margin-top:28px}
+@media(max-width:560px){header{padding:24px 16px}.question{padding:16px}.qhead{display:block}.tag{display:inline-block;margin-top:6px}}
+
+/* Presentación: una pregunta por pantalla */
+body.slideshow main.wrap{max-width:820px}
+body.slideshow #quiz>section{display:none}
+body.slideshow #quiz>section.active{display:block}
+body.slideshow #quiz>section.active .question{display:none}
+body.slideshow #quiz>section.active .question.current{display:block;min-height:300px;padding:clamp(20px,5vw,38px)}
+body.slideshow #quiz>section.active .question.current h3{font-size:clamp(1.25rem,3vw,1.65rem);line-height:1.35;margin:20px 0}
+body.slideshow #quiz>section.active .question.current .option{padding:15px 16px;font-size:1.02rem}
+body.slideshow .section-title{margin-top:8px}
+.slide-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 0 6px}
+.slide-nav .group{display:flex;gap:8px;flex-wrap:wrap}
+.slide-counter{font-weight:750;color:var(--muted);font-size:.92rem}
+body.slideshow #results{margin-top:22px}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Preparación para la nacionalidad española</div>
+    <h1>Test de práctica CCSE</h1>
+    <p>25 preguntas sobre los cinco bloques de contenidos. Elige una respuesta por pregunta. Después de responder, verás si has acertado y una explicación con la respuesta correcta.</p>
+  </div>
+</header>
+<main class="wrap">
+  <div class="topline">
+    <span class="pill">25 preguntas · 5 bloques</span>
+    <button class="action secondary" id="modeToggle" type="button">Vista: presentación</button>
+    <span class="pill" id="answered">Respondidas: 0 de 25</span>
+  </div>
+  <div class="progress" aria-label="Progreso"><div id="progressbar"></div></div>
+  <div id="quiz"></div>
+  <div class="slide-nav" id="slideNav">
+    <div class="group">
+      <button class="action secondary" id="prevSlide" type="button">← Anterior</button>
+      <button class="action primary" id="nextSlide" type="button">Siguiente →</button>
+    </div>
+    <span class="slide-counter" id="slideCounter">Pregunta 1 de 25</span>
+  </div>
+  <div class="actions">
+    <button class="action primary" id="finish">Ver resultado final</button>
+    <button class="action secondary" id="restart">Repetir el test</button>
+  </div>
+  <section id="results" aria-live="polite">
+    <h2>Resultado</h2>
+    <div class="score" id="score"></div>
+    <p id="summary"></p>
+    <div class="block-results" id="blockResults"></div>
+    <p class="small">Referencia orientativa: en el examen oficial CCSE se necesitan al menos 15 respuestas correctas de 25. Este test es material de práctica y no reproduce literalmente el examen oficial.</p>
+  </section>
+  <footer>
+    Para preparar la convocatoria real, consulta el <a href="https://examenes.cervantes.es/es/ccse/preparar-prueba" target="_blank" rel="noopener">manual CCSE 2026 del Instituto Cervantes</a>. Las preguntas de este ejercicio son originales y se han diseñado para practicar los cinco bloques.
+  </footer>
+</main>
+<script>
+const blocks = [
+{title:"Bloque 1. Gobierno, legislación y participación ciudadana", questions:[
+{q:"¿En qué año se aprobó la Constitución española vigente?",o:["1975","1978","1982"],a:1,e:"La Constitución española vigente fue aprobada en referéndum el 6 de diciembre de 1978."},
+{q:"¿Quién es el jefe del Estado en España?",o:["El presidente del Gobierno","El presidente del Congreso","El rey"],a:2,e:"España es una monarquía parlamentaria y el rey es el jefe del Estado."},
+{q:"¿Qué institución ejerce el poder legislativo estatal junto con el Senado?",o:["El Congreso de los Diputados","El Tribunal Supremo","El Consejo de Ministros"],a:0,e:"Las Cortes Generales están formadas por el Congreso de los Diputados y el Senado."},
+{q:"¿Quién dirige la acción del Gobierno y coordina a los ministros?",o:["El rey","El presidente del Gobierno","El presidente del Tribunal Constitucional"],a:1,e:"El presidente del Gobierno dirige la acción del Gobierno y coordina las funciones de sus miembros."},
+{q:"¿Qué institución interpreta la Constitución como norma suprema y controla la constitucionalidad de las leyes?",o:["El Tribunal Constitucional","El Tribunal de Cuentas","El Consejo de Estado"],a:0,e:"El Tribunal Constitucional controla que las leyes y determinadas actuaciones respeten la Constitución."},
+{q:"¿Cada cuánto tiempo se celebran normalmente las elecciones generales, si no hay adelanto electoral?",o:["Cada dos años","Cada cuatro años","Cada seis años"],a:1,e:"El mandato ordinario del Congreso y del Senado es de cuatro años, aunque puede haber disolución anticipada."},
+{q:"¿Qué documento recoge los derechos y deberes fundamentales y la organización básica del Estado?",o:["La Constitución","El padrón municipal","El código postal"],a:0,e:"La Constitución establece los principios fundamentales del Estado y reconoce derechos y deberes."},
+{q:"¿Qué institución representa a los ciudadanos en el ámbito municipal?",o:["El ayuntamiento","El Senado","El Consejo General del Poder Judicial"],a:0,e:"El ayuntamiento gobierna y administra el municipio; suele estar formado por el alcalde y los concejales."},
+{q:"¿Cuál es una función principal de los tribunales de justicia?",o:["Aprobar los presupuestos municipales","Juzgar y hacer ejecutar lo juzgado","Organizar las elecciones generales"],a:1,e:"Los juzgados y tribunales ejercen la función jurisdiccional: juzgan y hacen ejecutar lo juzgado."},
+{q:"¿Qué institución pública organiza la gestión de los impuestos estatales?",o:["La Agencia Estatal de Administración Tributaria","El Instituto Cervantes","La Biblioteca Nacional"],a:0,e:"La Agencia Tributaria aplica el sistema tributario estatal y gestiona, entre otras funciones, la recaudación de impuestos."}
+]},
+{title:"Bloque 2. Derechos y deberes fundamentales",questions:[
+{q:"Según la Constitución, ¿cómo son los españoles ante la ley?",o:["Diferentes según su profesión","Iguales, sin discriminación por las razones prohibidas por la Constitución","Iguales solo si tienen empleo"],a:1,e:"La Constitución reconoce la igualdad ante la ley y prohíbe la discriminación por diversos motivos."},
+{q:"¿Qué derecho protege la posibilidad de expresar y difundir libremente ideas y opiniones dentro de los límites legales?",o:["La libertad de expresión","El derecho a la herencia","El derecho de propiedad industrial"],a:0,e:"La libertad de expresión es un derecho fundamental reconocido por la Constitución, con los límites establecidos por el ordenamiento jurídico."},
+{q:"¿Cuál de estas acciones es una obligación general de las personas contribuyentes cuando corresponde legalmente?",o:["Pagar los impuestos debidos","Votar en todas las elecciones","Ser miembro de un partido político"],a:0,e:"Las personas deben contribuir al sostenimiento de los gastos públicos conforme a su capacidad económica y al sistema tributario."}
+]},
+{title:"Bloque 3. Organización territorial y geografía",questions:[
+{q:"¿Cuál es la capital de España?",o:["Barcelona","Sevilla","Madrid"],a:2,e:"Madrid es la capital de España y sede de las principales instituciones del Estado."},
+{q:"¿Cuántas comunidades autónomas tiene España?",o:["17","19","50"],a:0,e:"España tiene 17 comunidades autónomas y dos ciudades autónomas: Ceuta y Melilla."}
+]},
+{title:"Bloque 4. Cultura e historia de España",questions:[
+{q:"¿Quién pintó el cuadro *Las meninas*?",o:["Francisco de Goya","Diego Velázquez","Pablo Picasso"],a:1,e:"Diego Velázquez pintó *Las meninas* en el siglo XVII. La obra se conserva en el Museo del Prado, en Madrid."},
+{q:"¿Qué escritor español creó al personaje de don Quijote?",o:["Miguel de Cervantes","Federico García Lorca","Benito Pérez Galdós"],a:0,e:"Miguel de Cervantes escribió *Don Quijote de la Mancha*, una de las obras más conocidas de la literatura española."},
+{q:"¿En qué fecha se celebra la Fiesta Nacional de España?",o:["6 de diciembre","12 de octubre","1 de mayo"],a:1,e:"La Fiesta Nacional de España se celebra el 12 de octubre."}
+]},
+{title:"Bloque 5. Sociedad española y vida cotidiana",questions:[
+{q:"¿Qué trámite permite inscribirse como residente en un municipio?",o:["La matrícula universitaria","El empadronamiento","La declaración de la renta"],a:1,e:"El empadronamiento es la inscripción en el padrón municipal del municipio donde se reside habitualmente."},
+{q:"¿Qué organismo gestiona las prestaciones y pensiones contributivas de la Seguridad Social, dentro de sus competencias?",o:["El Instituto Nacional de la Seguridad Social (INSS)","La Dirección General de Tráfico","El Instituto Cervantes"],a:0,e:"El INSS gestiona y reconoce, entre otras, numerosas prestaciones económicas del sistema de la Seguridad Social."},
+{q:"¿Dónde se suele solicitar una cita para una consulta médica de atención primaria en la sanidad pública?",o:["En el centro de salud o mediante los canales habilitados por el servicio sanitario autonómico","En el Congreso de los Diputados","En una oficina de correos exclusivamente"],a:0,e:"La cita de atención primaria se gestiona habitualmente a través del centro de salud, por teléfono o por los canales digitales de cada servicio autonómico."},
+{q:"¿Qué documento identifica a los ciudadanos españoles mayores de 14 años dentro de España, con carácter general?",o:["El DNI","El permiso de conducir únicamente","La tarjeta sanitaria"],a:0,e:"El Documento Nacional de Identidad (DNI) acredita la identidad y los datos personales de los ciudadanos españoles."},
+{q:"¿Qué servicio público se ocupa principalmente de regular el tráfico y expedir permisos de conducir?",o:["La Dirección General de Tráfico (DGT)","El Instituto Nacional de Estadística","El Museo del Prado"],a:0,e:"La DGT desarrolla funciones relacionadas con la seguridad vial, la regulación del tráfico y los permisos de conducción."},
+{q:"¿Qué institución pública suele ofrecer orientación e intermediación para buscar empleo?",o:["El servicio público de empleo","El Registro Civil exclusivamente","El Senado"],a:0,e:"Los servicios públicos de empleo ofrecen orientación laboral y otros recursos para personas que buscan trabajo; existen servicios estatales y autonómicos."},
+{q:"¿Qué impuesto grava, con carácter general, el consumo de bienes y servicios en España?",o:["El IVA","El IRPF","El impuesto sobre sucesiones exclusivamente"],a:0,e:"El Impuesto sobre el Valor Añadido (IVA) grava, con carácter general, el consumo de bienes y servicios. El IRPF grava la renta de las personas físicas."}
+]}
+];
+const quiz = document.getElementById("quiz");
+const answers = {};
+let flat = [];
+blocks.forEach((b,bi)=>{
+  const section=document.createElement("section");
+  section.innerHTML=`<h2 class="section-title">${b.title}</h2>`;
+  b.questions.forEach((item,qi)=>{
+    const idx=flat.length; flat.push({...item,block:bi});
+    const card=document.createElement("article"); card.className="question"; card.id=`q-${idx}`;
+    const options=item.o.map((op,oi)=>`<button class="option" type="button" data-q="${idx}" data-a="${oi}"><span class="letter">${String.fromCharCode(65+oi)}.</span><span>${op}</span></button>`).join("");
+    card.innerHTML=`<div class="qhead"><span class="qnum">Pregunta ${idx+1} de 25</span><span class="tag">Bloque ${bi+1}</span></div><h3>${item.q}</h3><div class="options">${options}</div><div class="feedback" id="feedback-${idx}" aria-live="polite"></div>`;
+    section.appendChild(card);
+  });
+  quiz.appendChild(section);
+});
+
+let currentSlide = 0;
+let slideshow = true;
+document.body.classList.add("slideshow");
+function showSlide(index){
+  currentSlide = Math.max(0, Math.min(flat.length-1, index));
+  document.querySelectorAll("#quiz>section").forEach(s=>s.classList.remove("active"));
+  const item = flat[currentSlide];
+  const section = document.querySelectorAll("#quiz>section")[item.block];
+  section.classList.add("active");
+  section.querySelectorAll(".question").forEach(q=>q.classList.remove("current"));
+  document.getElementById(`q-${currentSlide}`).classList.add("current");
+  document.getElementById("slideCounter").textContent=`Pregunta ${currentSlide+1} de ${flat.length} · Bloque ${item.block+1} de 5`;
+  document.getElementById("prevSlide").disabled = currentSlide===0;
+  document.getElementById("prevSlide").style.opacity = currentSlide===0?".5":"1";
+  document.getElementById("nextSlide").textContent = currentSlide===flat.length-1 ? "Ir a resultados ↓" : "Siguiente →";
+  document.getElementById("progressbar").style.width=`${Object.keys(answers).length/flat.length*100}%`;
+}
+document.getElementById("prevSlide").addEventListener("click",()=>showSlide(currentSlide-1));
+document.getElementById("nextSlide").addEventListener("click",()=>{
+  if(currentSlide<flat.length-1) showSlide(currentSlide+1);
+  else document.getElementById("finish").click();
+});
+document.getElementById("modeToggle").addEventListener("click",()=>{
+  slideshow=!slideshow;
+  document.body.classList.toggle("slideshow",slideshow);
+  document.getElementById("modeToggle").textContent=slideshow?"Vista: presentación":"Vista: todas las preguntas";
+  document.getElementById("slideNav").style.display=slideshow?"flex":"none";
+  if(slideshow) showSlide(currentSlide);
+  else document.querySelectorAll("#quiz>section").forEach(s=>s.classList.add("active"));
+});
+
+function updateProgress(){
+ const n=Object.keys(answers).length;
+ document.getElementById("answered").textContent=`Respondidas: ${n} de ${flat.length}`;
+ document.getElementById("progressbar").style.width=`${n/flat.length*100}%`;
+}
+quiz.addEventListener("click",ev=>{
+ const btn=ev.target.closest("button.option"); if(!btn)return;
+ const idx=Number(btn.dataset.q), chosen=Number(btn.dataset.a);
+ if(answers[idx]!==undefined)return;
+ answers[idx]=chosen;
+ const item=flat[idx], card=document.getElementById(`q-${idx}`);
+ card.querySelectorAll(".option").forEach((b,i)=>{
+   b.disabled=true;
+   if(i===item.a)b.classList.add("correct");
+   if(i===chosen && chosen!==item.a)b.classList.add("incorrect");
+ });
+ const fb=document.getElementById(`feedback-${idx}`);
+ const ok=chosen===item.a;
+ fb.className=`feedback show ${ok?"good":"bad"}`;
+ fb.innerHTML=`<strong>${ok?"¡Correcto!":"Respuesta incorrecta"}</strong>${ok?"":`La respuesta correcta es: <strong>${item.o[item.a]}</strong>. `}${item.e}`;
+ updateProgress();
+});
+showSlide(0);
+document.getElementById("finish").addEventListener("click",()=>{
+ const count=Object.keys(answers).length;
+ let score=0, per=blocks.map(()=>({right:0,total:0}));
+ flat.forEach((q,i)=>{per[q.block].total++;if(answers[i]===q.a){score++;per[q.block].right++;}});
+ document.getElementById("score").textContent=`${score} / ${flat.length}`;
+ document.getElementById("summary").textContent=count<flat.length?`Has respondido ${count} de ${flat.length} preguntas. Las preguntas sin responder cuentan como incorrectas en este resultado.`:(score>=15?"Has alcanzado la referencia de aprobado del examen oficial (15/25). ¡Buen trabajo!":"Todavía no llegas a 15 respuestas correctas. Repasa las explicaciones y vuelve a intentarlo.");
+ document.getElementById("blockResults").innerHTML=blocks.map((b,i)=>`<div><span class="small">Bloque ${i+1}</span><strong>${per[i].right}/${per[i].total}</strong><span class="small">${b.title.replace(/^Bloque \d+\. /,"")}</span></div>`).join("");
+ const r=document.getElementById("results");r.classList.add("show");r.scrollIntoView({behavior:"smooth",block:"start"});
+});
+document.getElementById("restart").addEventListener("click",()=>{location.reload();});
+</script>
+</body>
+</html>
